@@ -22,6 +22,12 @@ module.exports = {
     }, // a function which handles a get request for all messages
     post: function (req, res) {
       //receive message and send to model
+      // console.log(req.body);
+      models.messages.post(req.body)
+      .then(function(message) {
+        res.end(JSON.stringify(message));
+      });
+      // console.log(req.body.text);
         //on completion write response
         //send response back to client w/some expected data
 
