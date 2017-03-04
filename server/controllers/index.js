@@ -38,10 +38,28 @@ module.exports = {
     // Ditto as above
     get: function (req, res) {
       // ask the database for the users
+      models.users.get(req.body)
+      .then(function(usernames) {
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify({results: usernames}));
+      })
+      .catch(function(err) {
+        res.writeHead(500, {'Content-Type': 'application/json'});
+        res.end();
+      });
         // on completion send the reponse with users as body
     },
     post: function (req, res) {
       // receive the username and send to the model
+      models.users.post(req.body)
+      .then(function() {
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify({results: req.body}));
+      })
+      .catch(function(err) {
+        res.writeHead(500, {'Content-Type': 'application/json'});
+        res.end();
+      });
         // on completion  write response
         // send response to the client with data
     }

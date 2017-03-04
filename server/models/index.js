@@ -49,13 +49,14 @@ module.exports = {
     post: function (message) {
       // create user if it doesn't exist
      
-      var usernameQueryString = 'INSERT into users (username) SELECT username FROM (SELECT "' + message.username + '" username) users WHERE NOT EXISTS (SELECT username FROM users WHERE username ="' + message.username + '")';
+      // var usernameQueryString = 'INSERT into users (username) SELECT username FROM (SELECT "' + message.username + '" username) users WHERE NOT EXISTS (SELECT username FROM users WHERE username ="' + message.username + '")';
 
       var postQueryString = 'insert into messages (text, roomname, username) values ("' + message.text + '", "' + message.roomname + '", (SELECT id FROM users WHERE username = "' + message.username + '"))';
       
       var lastMessageQueryString = 'SELECT * from messages where id = LAST_INSERT_ID()';
       
-      query(usernameQueryString);
+      // query(usernameQueryString);
+      module.exports.users.post(message);
 
       query(postQueryString);
 
@@ -67,7 +68,7 @@ module.exports = {
           roomname: row.roomname,
           username: row.username
         };
-        resolve(message);
+        return message;
       });
       //if username does not exist in users table
         //insert message.username into users table
@@ -82,8 +83,22 @@ module.exports = {
 
   users: {
     // Ditto as above.
-    get: function () {},
-    post: function () {}
+    get: function () {
+      return query('SELECT * FROM users')
+      .then(function(users) {
+        var usernames = users.map((user) => {
+          return {
+            username: user.username
+          };
+        });
+        return usernames;
+      });
+    },
+    post: function (message) {
+      var usernameQueryString = 'INSERT into users (username) SELECT username FROM (SELECT "' + message.username + '" username) users WHERE NOT EXISTS (SELECT username FROM users WHERE username ="' + message.username + '")';
+
+      return query(usernameQueryString);
+    }
   }
 };
 
